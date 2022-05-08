@@ -1,6 +1,6 @@
 {
   "name": "setup-docker-remote",
-  "description": "Setup SSH and docker environment for remote deployment",
+  "description": "Setup SSH and docker environment for remote deployment (forked from nightstory)",
   "version": "1.0.0",
   "keywords": [
     "github",
@@ -13,13 +13,13 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nightstory/setup-docker-remote.git"
+    "url": "git+https://github.com/blennster/setup-docker-remote.git"
   },
   "bugs": {
-    "url": "https://github.com/nightstory/setup-docker-remote/issues"
+    "url": "https://github.com/blennster/setup-docker-remote/issues"
   },
-  "homepage": "https://github.com/nightstory/setup-docker-remote#readme",
-  "author": "nightstory",
+  "homepage": "https://github.com/blennster/setup-docker-remote#readme",
+  "author": "blennster",
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0"
