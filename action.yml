@@ -1,4 +1,4 @@
-name: 'setup-docker-remote'
+name: 'setup-docker-remote-new'
 description: 'Setup SSH and docker environment for remote deployment'
 branding:
   icon: briefcase
