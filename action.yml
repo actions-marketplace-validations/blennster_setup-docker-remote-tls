@@ -7,6 +7,9 @@ inputs:
   ssh_key:
     description: 'Raw content of the private key (~/.ssh/id_rsa)'
     required: false
+  ssh_pub_key:
+    description: 'Raw content of the public key (~/.ssh/id_rsa.pub)'
+    required: false
   ssh_host_user:
     description: 'SSH username, e.g. from username@host use username'
     required: false
