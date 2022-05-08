@@ -22,7 +22,10 @@ const main = async () => {
   // write necessary files & set modes
   fs.writeFileSync(`${sshDir}/id_rsa`, options.sshKey)
   await exec.exec('chmod', ['400', `${sshDir}/id_rsa`])
-
+  
+  fs.writeFileSync(`${sshDir}/id_rsa.pub`, options.sshPubkey)
+  await exec.exec('chmod', ['400', `${sshDir}/id_rsa.pub`])
+  
   // pass host validation
   if (options.skipStrictHostKeyChecking) {
     fs.writeFileSync(`${sshDir}/config`, 'Host *\n  StrictHostKeyChecking no')
