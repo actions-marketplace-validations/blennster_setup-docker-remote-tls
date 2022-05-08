@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 
 export interface Options {
   readonly sshKey: string
+  readonly sshPubkey: string
   readonly skipStrictHostKeyChecking: boolean
   readonly knownHosts: string | null
   readonly remoteHostUser: string
@@ -37,6 +38,7 @@ const getFlag: (inputKey: string, envKey: string, def: boolean) => boolean =
 
 const getOptions: () => Options = () => ({
   sshKey: requireOption('ssh_key', 'SDR_SSH_KEY')!,
+  sshPubkey: requireOption('ssh_pub_key', 'SDR_SSH_PUB_KEY')!,
   skipStrictHostKeyChecking: getFlag('ssh_skip_strict_host', 'SDR_SSH_SKIP_STRICT_HOST', true),
   knownHosts: findOption('ssh_known_hosts', 'SDR_SSH_KNOWN_HOSTS'),
   remoteHostUser: requireOption('ssh_host_user', 'SDR_SSH_HOST_USER'),
@@ -47,8 +49,8 @@ export const validateOptions: (options: Options) => boolean =
   (o) => {
     let result = true
 
-    if ([o.sshKey, o.remoteHostUser, o.remoteHost].some(v => v.length === 0)) {
-      core.setFailed(`ssh_key, ssh_host and ssh_host_user must not be empty`)
+    if ([o.sshKey, o.sshPubkey, o.remoteHostUser, o.remoteHost].some(v => v.length === 0)) {
+      core.setFailed(`ssh_key, ssh_pub_key ssh_host and ssh_host_user must not be empty`)
       result = false
     }
 
