@@ -1,48 +1,34 @@
-# Setup SSH & DOCKER_HOST in a GitHub Action
+# Setup TLS & DOCKER_HOST in a GitHub Action
 
-# THIS IS A TEST IF NEW OPENSSH BREAKS BUILDS!
+Based on [secure by default](https://docs.docker.com/engine/security/protect-access/#secure-by-default).
 
-A small wrapper to set up SSH and DOCKER_HOST for the remote deployment.<br/>
-⚠️ Resets `.ssh` before and after running the action. Sets and resets `DOCKER_HOST`.
+A small wrapper to set up TLS and DOCKER_HOST for the remote deployment.<br/>
+⚠️ Resets `.docker/{ca,key,cert}.pem` before and after running the action. Sets and resets `DOCKER_HOST` and `DOCKER_VERIFY_TLS`.
 
 ## Inputs
-- `ssh_key`
-    - Raw content of the private key (`~/.ssh/id_rsa`)
-    - Environment alternative: `SDR_SSH_KEY`
-- `ssh_host_user`
-    - SSH username, e.g. from `username@host` use `username`
-    - Environment alternative: `SDR_SSH_HOST_USER`
-- `ssh_host`
-    - SSH host, e.g. from `username@host` use `host`
-    - Environment alternative: `SDR_SSH_HOST`
-- `ssh_known_hosts`
-    - Raw content of the known_hosts file (`~/.ssh/known_hosts`)
-    - Environment alternative: `SDR_SSH_KNOWN_HOSTS`
-- `ssh_skip_strict_host`
-    - If true, will set `StrictHostKeyChecking` to `no` for `*` host
-    - default: `true`
-    - Environment alternative: `SDR_SSH_SKIP_STRICT_HOST`
+- `tls_ca`
+    - Raw content of the cert key (`~/.docker/ca.pem`)
+    - Environment alternative: `SDR_TLS_ca`
+- `tls_key`
+    - Raw content of the private key (`~/.docker/key.pem`)
+    - Environment alternative: `SDR_TLS_KEY`
+- `tls_cert`
+    - Raw content of the cert key (`~/.docker/cert.pem`)
+    - Environment alternative: `SDR_TLS_CERT`
+- `tcp_host`
+    - TCP host, e.g. the hostname to connect to (the one used on server key `CN`) WITH port
+    - Environment alternative: `SDR_TCP_HOST`
 
 ## Example usage
 
 Without explicit `known_hosts` used:
 ```yaml
-uses: nightstory/setup-docker-remote@v1
+uses: blennster/setup-docker-remote-tls@v1
 with:
-  ssh_key: ${{ env.SSH_PRIVATE_KEY_ID_RSA }}
-  ssh_host_user: root
-  ssh_host: ${{ env.DEV_SERVER_IP }}
-```
-
-With explicit `known_hosts` used:
-```yaml
-uses: nightstory/setup-docker-remote@v1
-with:
-  ssh_key: ${{ env.SSH_PRIVATE_KEY_ID_RSA }}
-  ssh_host_user: root
-  ssh_host: ${{ env.DEV_SERVER_IP }}
-  ssh_skip_strict_host: false
-  ssh_known_hosts: ${{ env.SSH_KNOWN_HOSTS }}
+  tls_ca: ${{ secrets.TLS_CA }}
+  tls_key: ${{ secrets.TLS_PRIVATE_KEY }}
+  tls_cert: ${{ secrets.TLS_CERT }}
+  tcp_host: root.domain.example
 ```
 
 With environment variables:
@@ -54,16 +40,17 @@ on:
     branches: [ '*' ]
 
 env:
-  SDR_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY_ID_RSA }}
-  SDR_SSH_HOST_USER: ${{ secrets.SDR_SSH_HOST_USER }}
-  SDR_SSH_HOST: ${{ secrets.DEV_SERVER_IP }}
+  SDR_TLS_CA: ${{ secrets.TLS_CA }}
+  SDR_TLS_KEY: ${{ secrets.TLS_PRIVATE_KEY }}
+  SDR_TLS_CERT: ${{ secrets.TLS_CERT }}
+  SDR_TCP_HOST: ${{ secrets.DEV_SERVER_HOSTNAME }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Setup SSH and docker remote host'
-        uses: nightstory/setup-docker-remote@v1
+      - name: 'Setup TLS and docker remote host'
+        uses: blennster/setup-docker-remote-tls@v1
       
       - name: 'Execute docker ps via remote host'
         run: docker ps
@@ -71,24 +58,22 @@ jobs:
 
 ## What it essentially does
 ```shell
-rm -rf $HOME/.ssh && \
-  mkdir -p $HOME/.ssh && \
-  echo "$ssh_key" > $HOME/.ssh/id_rsa && \
-  echo  "$ssh_known_hosts" > $HOME/.ssh/known_hosts && \
-  chmod 400 $HOME/.ssh/id_rsa && \
-  chmod 400 $HOME/.ssh/known_hosts
+rm -rf $HOME/.docker && \
+  mkdir -pv $HOME/.docker && \
+  echo "$tls_ca" > $HOME/.docker/ca.pem && \
+  echo "$tls_key" > $HOME/.docker/key.pem && \
+  echo "$tls_cert" > $HOME/.docker/cert.pem && \
+  chmod 400 $HOME/.docker/{ca,key,cert}.pem && \
 
-export DOCKER_HOST="ssh://$ssh_host_user@$ssh_host"
-```
-Or, in the unsafe way (instead of the known_hosts part):
-```shell
-printf "Host *\n  StrictHostKeyChecking no" >> $HOME/.ssh/config
+export DOCKER_HOST="tcp://$tcp_host"
+export DOCKER_TLS_VERIFY=1
 ```
 
 ...and cleanup:
 ```shell
-rm -rf $HOME/.ssh
+rm -rf $HOME/.docker/{ca,key,cert}.pem
 unset DOCKER_HOST
+unset DOCKER_TLS_VERIFY
 ```
 
 ## License
