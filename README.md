@@ -6,24 +6,26 @@ A small wrapper to set up TLS and DOCKER_HOST for the remote deployment.<br/>
 ⚠️ Resets `.docker/{ca,key,cert}.pem` before and after running the action. Sets and resets `DOCKER_HOST` and `DOCKER_VERIFY_TLS`.
 
 ## Inputs
+
 - `tls_ca`
-    - Raw content of the cert key (`~/.docker/ca.pem`)
-    - Environment alternative: `SDR_TLS_ca`
+  - Raw content of the cert key (`~/.docker/ca.pem`)
+  - Environment alternative: `SDR_TLS_ca`
 - `tls_key`
-    - Raw content of the private key (`~/.docker/key.pem`)
-    - Environment alternative: `SDR_TLS_KEY`
+  - Raw content of the private key (`~/.docker/key.pem`)
+  - Environment alternative: `SDR_TLS_KEY`
 - `tls_cert`
-    - Raw content of the cert key (`~/.docker/cert.pem`)
-    - Environment alternative: `SDR_TLS_CERT`
+  - Raw content of the cert key (`~/.docker/cert.pem`)
+  - Environment alternative: `SDR_TLS_CERT`
 - `tcp_host`
-    - TCP host, e.g. the hostname to connect to (the one used on server key `CN`) WITH port
-    - Environment alternative: `SDR_TCP_HOST`
+  - TCP host, e.g. the hostname to connect to (the one used on server key `CN`) WITH port
+  - Environment alternative: `SDR_TCP_HOST`
 
 ## Example usage
 
 Without explicit `known_hosts` used:
+
 ```yaml
-uses: blennster/setup-docker-remote-tls@v1
+uses: blennster/setup-docker-remote-tls@v3
 with:
   tls_ca: ${{ secrets.TLS_CA }}
   tls_key: ${{ secrets.TLS_PRIVATE_KEY }}
@@ -32,12 +34,13 @@ with:
 ```
 
 With environment variables:
+
 ```yaml
 name: 'remote-deploy'
 
 on:
   push:
-    branches: [ '*' ]
+    branches: ['*']
 
 env:
   SDR_TLS_CA: ${{ secrets.TLS_CA }}
@@ -50,13 +53,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Setup TLS and docker remote host'
-        uses: blennster/setup-docker-remote-tls@v1
-      
+        uses: blennster/setup-docker-remote-tls@v3
+
       - name: 'Execute docker ps via remote host'
         run: docker ps
 ```
 
 ## What it essentially does
+
 ```shell
 rm -rf $HOME/.docker && \
   mkdir -pv $HOME/.docker && \
@@ -70,6 +74,7 @@ export DOCKER_TLS_VERIFY=1
 ```
 
 ...and cleanup:
+
 ```shell
 rm -rf $HOME/.docker/{ca,key,cert}.pem
 unset DOCKER_HOST
@@ -77,5 +82,6 @@ unset DOCKER_TLS_VERIFY
 ```
 
 ## License
+
 Licensed under MIT license.<br/>
 Please also see [licenses.txt](lib_main/licenses.txt)
