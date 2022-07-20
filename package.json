@@ -1,24 +1,25 @@
 {
-  "name": "setup-docker-remote",
-  "description": "Setup SSH and docker environment for remote deployment (forked from nightstory)",
+  "name": "setup-docker-remote-tls",
+  "description": "Setup TLS and docker environment for remote deployment (forked from nightstory)",
   "version": "1.0.0",
   "keywords": [
     "github",
     "actions",
     "github actions",
     "docker",
-    "ssh"
+    "tls",
+    "remote"
   ],
   "license": "MIT",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blennster/setup-docker-remote.git"
+    "url": "git+https://github.com/blennster/setup-docker-remote-tls.git"
   },
   "bugs": {
-    "url": "https://github.com/blennster/setup-docker-remote/issues"
+    "url": "https://github.com/blennster/setup-docker-remote-tls/issues"
   },
-  "homepage": "https://github.com/blennster/setup-docker-remote#readme",
+  "homepage": "https://github.com/blennster/setup-docker-remote-tls#readme",
   "author": "blennster",
   "dependencies": {
     "@actions/core": "^1.6.0",

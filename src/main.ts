@@ -1,46 +1,41 @@
-import * as core from '@actions/core'
-import * as exec from '@actions/exec'
-import os from 'os'
-import fs from 'fs'
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+import os from 'os';
+import fs from 'fs';
 
-import getOptions, {Options, validateOptions} from './options'
+import getOptions, { Options, validateOptions } from './options';
 
 const main = async () => {
   // retrieve the options
-  const options: Options = getOptions()
+  const options: Options = getOptions();
 
   if (!validateOptions(options)) {
-    process.exit(1)
+    process.exit(1);
   }
 
-  const sshDir = os.homedir() + '/.ssh'
+  const dockerDir = os.homedir() + '/.docker';
 
   // ensure clear ssh setup
-  await exec.exec('rm', ['-rf', sshDir])
-  await exec.exec('mkdir', ['-p', sshDir])
+  await exec.exec('rm', ['-rf', dockerDir]);
+  await exec.exec('mkdir', ['-pv', dockerDir]);
 
   // write necessary files & set modes
-  fs.writeFileSync(`${sshDir}/id_rsa`, options.sshKey)
-  await exec.exec('chmod', ['400', `${sshDir}/id_rsa`])
-  
-  fs.writeFileSync(`${sshDir}/id_rsa.pub`, options.sshPubkey)
-  await exec.exec('chmod', ['400', `${sshDir}/id_rsa.pub`])
-  
-  // pass host validation
-  if (options.skipStrictHostKeyChecking) {
-    fs.writeFileSync(`${sshDir}/config`, 'Host *\n  StrictHostKeyChecking no')
-    await exec.exec('chmod', ['400', `${sshDir}/config`])
-  } else {
-    fs.writeFileSync(`${sshDir}/known_hosts`, options.knownHosts!)
-    await exec.exec('chmod', ['400', `${sshDir}/known_hosts`])
-  }
+  fs.writeFileSync(`${dockerDir}/key.pem`, options.tlsKey);
+  await exec.exec('chmod', ['400', `${dockerDir}/key.pem`]);
+
+  fs.writeFileSync(`${dockerDir}/ca.pem`, options.tlsCa);
+  await exec.exec('chmod', ['400', `${dockerDir}/ca.pem`]);
+
+  fs.writeFileSync(`${dockerDir}/cert.pem`, options.tlsCert);
+  await exec.exec('chmod', ['400', `${dockerDir}/cert.pem`]);
 
   // setup remote docker environment
-  core.exportVariable('DOCKER_HOST', `ssh://${options.remoteHostUser}@${options.remoteHost}`)
-}
+  core.exportVariable('DOCKER_HOST', `tcp://${options.tcpHost}`);
+  core.exportVariable('DOCKER_TLS_VERIFY', 1);
+};
 
 try {
-  main()
+  main();
 } catch (error) {
-  core.setFailed(`${error}`)
+  core.setFailed(`${error}`);
 }
