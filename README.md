@@ -25,7 +25,7 @@ A small wrapper to set up TLS and DOCKER_HOST for the remote deployment.<br/>
 Without explicit `known_hosts` used:
 
 ```yaml
-uses: blennster/setup-docker-remote-tls@v3
+uses: blennster/setup-docker-remote-tls@v4
 with:
   tls_ca: ${{ secrets.TLS_CA }}
   tls_key: ${{ secrets.TLS_PRIVATE_KEY }}

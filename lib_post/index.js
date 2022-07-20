@@ -2868,7 +2868,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // reset verify tls
     core.exportVariable('DOCKER_VERIFY_TLS', null);
     // reset ssh
-    yield exec.exec('rm', ['-rf', os_1.default.homedir() + '/.docker/{ca,key,cert}.pem']);
+    yield exec.exec('rm', ['-rf', os_1.default.homedir() + '/.docker']);
 });
 try {
     main();
