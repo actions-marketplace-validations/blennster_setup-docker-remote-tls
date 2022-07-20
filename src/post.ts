@@ -10,7 +10,7 @@ const main = async () => {
   core.exportVariable('DOCKER_VERIFY_TLS', null);
 
   // reset ssh
-  await exec.exec('rm', ['-rf', os.homedir() + '/.docker/{ca,key,cert}.pem']);
+  await exec.exec('rm', ['-rf', os.homedir() + '/.docker']);
 };
 
 try {
